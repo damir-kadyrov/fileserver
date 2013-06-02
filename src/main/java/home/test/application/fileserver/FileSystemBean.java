@@ -45,7 +45,7 @@ public class FileSystemBean {
                 if(result){
                     init();
                 } else {
-                    //TODO: предупредить пользователя
+                    //TODO: alert the user
                 }
             }
         }
@@ -57,6 +57,7 @@ public class FileSystemBean {
         if(!file.exists()){
             boolean result = file.mkdir();
         } else {
+            //TODO: alert the user
         }
         init();
     }
@@ -65,16 +66,6 @@ public class FileSystemBean {
         if(currentSelection!=null && currentSelection instanceof FileNode){
             FileNode fileNode = (FileNode) currentSelection;
             parentPath = fileNode.getRootDir().getCanonicalPath();
-//            String fileName = fileNode.getRootDir().getCanonicalPath()+"/testdir";
-//            File file = new File(fileName);
-//            if(!file.exists()){
-//                boolean result = file.mkdir();
-//                if(result){
-//                    init();
-//                }   else {
-//                    //TODO: предупредить пользователя
-//                }
-//            }
         }
     }
 
