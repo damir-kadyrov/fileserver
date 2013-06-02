@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +29,24 @@ public class FileSystemBean {
     private Set<FileNode> nodes = new TreeSet<FileNode>();
     private String directoryName;
     private String parentPath;
+    private String newName;
+    private String oldName;
+
+    public String getNewName() {
+        return newName;
+    }
+
+    public void setNewName(String newName) {
+        this.newName = newName;
+    }
+
+    public String getOldName() {
+        return oldName;
+    }
+
+    public void setOldName(String oldName) {
+        this.oldName = oldName;
+    }
 
     public String getDirectoryName() {
         return directoryName;
@@ -37,22 +54,6 @@ public class FileSystemBean {
 
     public void setDirectoryName(String directoryName) {
         this.directoryName = directoryName;
-    }
-
-    public void addFile() throws IOException {
-        if(currentSelection!=null && currentSelection instanceof FileNode){
-            FileNode fileNode = (FileNode) currentSelection;
-            String fileName = fileNode.getRootDir().getCanonicalPath()+"/testdir.txt";
-            File file = new File(fileName);
-            if(!file.exists()){
-                boolean result = file.createNewFile();
-                if(result){
-                    init();
-                } else {
-                    //TODO: alert the user
-                }
-            }
-        }
     }
 
     public void createDirectory() throws IOException{
@@ -67,19 +68,59 @@ public class FileSystemBean {
             }
             init();
         }
-
     }
 
-    public void showAddDirectoryPanel() throws IOException {
+    public void renameDirectory() throws IOException{
         if(currentSelection!=null && currentSelection instanceof FileNode){
             FileNode fileNode = (FileNode) currentSelection;
             parentPath = fileNode.getRootDir().getCanonicalPath();
+            File old = new File(String.format("%s", parentPath));
+            if(old.exists()){
+                boolean result = old.renameTo(new File(String.format("%s/%s", old.getParent(), newName)));
+                if(result) oldName = newName;
+            } else {
+                //TODO: alert the user
+            }
+            init();
+        }
+        if(currentSelection!=null && currentSelection instanceof File){
+            File file = (File) currentSelection;
+            parentPath = file.getCanonicalPath();
+            File old = new File(String.format("%s", parentPath));
+            if(old.exists()){
+                boolean result = old.renameTo(new File(String.format("%s/%s", old.getParent(), newName)));
+                if(result) oldName = newName;
+            } else {
+                //TODO: alert the user
+            }
+            init();
         }
     }
 
-    public void actionListener(){
+    public void deleteDirectory() throws IOException{
         if(currentSelection!=null && currentSelection instanceof FileNode){
-            nodes.iterator().next().addFile(new File("test.txt"));
+            FileNode fileNode = (FileNode) currentSelection;
+            parentPath = fileNode.getRootDir().getCanonicalPath();
+            File old = new File(String.format("%s", parentPath));
+            if(old.exists()){
+                old.delete();
+                oldName = newName = "";
+            } else {
+                //TODO: alert the user
+            }
+            init();
+        }
+        if(currentSelection!=null && currentSelection instanceof File){
+            File fileNode = (File) currentSelection;
+            parentPath = fileNode.getCanonicalPath();
+            File old = new File(String.format("%s", parentPath));
+            if(old.exists()){
+                old.delete();
+                oldName = newName = "";
+            } else {
+                //TODO: alert the user
+            }
+            init();
         }
     }
 
@@ -91,7 +132,7 @@ public class FileSystemBean {
         this.currentSelection = currentSelection;
     }
 
-    public void selectionChanged(TreeSelectionChangeEvent selectionChangeEvent) {
+    public void selectionChanged(TreeSelectionChangeEvent selectionChangeEvent) throws IOException {
         // considering only single selection
         List<Object> selection = new ArrayList<Object>(selectionChangeEvent.getNewSelection());
         Object currentSelectionKey = selection.get(0);
@@ -99,6 +140,14 @@ public class FileSystemBean {
         Object storedKey = tree.getRowKey();
         tree.setRowKey(currentSelectionKey);
         setCurrentSelection(tree.getRowData());
+        if(currentSelection!=null && currentSelection instanceof FileNode){
+            FileNode fileNode = (FileNode) currentSelection;
+            parentPath = fileNode.getRootDir().getCanonicalPath();
+            oldName = new File(parentPath).getName();
+        } else {
+            File file = (File) currentSelection;
+            oldName = file.getName();
+        }
         tree.setRowKey(storedKey);
     }
 
@@ -136,6 +185,7 @@ public class FileSystemBean {
             printWriter.write(item.getData());
             printWriter.close();
         }
+        init();
     }
 
 }

@@ -28,32 +28,56 @@
             }
         </h:outputStylesheet>
         <h:form>
-            <h:panelGrid columns="3">
-                <h:outputText value="directory name: "/>
-                <h:inputText value="#{fileSystemBean.directoryName}"/>
-                <a4j:commandButton value="add" render="filetree" action="#{fileSystemBean.createDirectory}"/>
-            </h:panelGrid>
-            <h:panelGrid>
-                <rich:fileUpload fileUploadListener="#{fileSystemBean.listener}" id="upload" maxFilesQuantity="1">
-                    <a4j:ajax event="uploadcomplete" execute="@none" render="info" />
-                </rich:fileUpload>
-            </h:panelGrid>
             <h:panelGrid columns="2">
-                <h:inputText value="#{fileSystemBean.rootPath}"/>
-                <a4j:commandButton value="update" render="filetree" action="#{fileSystemBean.reload}"/>
-                <rich:tree id="filetree" toggleType="ajax" var="item"
-                           selectionType="ajax" selectionChangeListener="#{fileSystemBean.selectionChanged}">
-                    <rich:treeModelRecursiveAdaptor id="treeNode" roots="#{fileSystemBean.fileNode}" nodes="#{item.dirs}">
-                        <rich:treeNode id="dirTreeNode">
-                            <h:outputText value="#{item.path}"/>
-                        </rich:treeNode>
-                        <rich:treeModelAdaptor nodes="#{item.files}">
-                            <rich:treeNode id="fileTreeNode">
-                                <h:outputText value="#{item.name}"/>
+                <h:column>
+                    <rich:tree id="filetree" toggleType="ajax" var="item"
+                               selectionType="ajax" render="renamepanel" selectionChangeListener="#{fileSystemBean.selectionChanged}">
+                        <rich:treeModelRecursiveAdaptor id="treeNode" roots="#{fileSystemBean.fileNode}" nodes="#{item.dirs}">
+                            <rich:treeNode id="dirTreeNode">
+                                <h:outputText value="#{item.path}"/>
                             </rich:treeNode>
-                        </rich:treeModelAdaptor>
-                    </rich:treeModelRecursiveAdaptor>
-                </rich:tree>
+                            <rich:treeModelAdaptor nodes="#{item.files}">
+                                <rich:treeNode id="fileTreeNode">
+                                    <h:outputText value="#{item.name}"/>
+                                </rich:treeNode>
+                            </rich:treeModelAdaptor>
+                        </rich:treeModelRecursiveAdaptor>
+                    </rich:tree>
+                </h:column>
+                <h:column>
+                    <rich:panel header="Current directory">
+                        <h:panelGrid columns="3">
+                            <h:outputText value="Name: "/>
+                            <h:inputText value="#{fileSystemBean.rootPath}"/>
+                            <a4j:commandButton value="update" render="filetree" action="#{fileSystemBean.reload}"/>
+                        </h:panelGrid>
+                    </rich:panel>
+                    <rich:panel header="Create directory">
+                        <h:panelGrid columns="3">
+                            <h:outputText value="Name: "/>
+                            <h:inputText value="#{fileSystemBean.directoryName}"/>
+                            <a4j:commandButton value="add" render="filetree" action="#{fileSystemBean.createDirectory}"/>
+                        </h:panelGrid>
+                    </rich:panel>
+
+                    <rich:panel id="renamepanel" header="Rename">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Current name: "/>
+                            <h:inputText value="#{fileSystemBean.oldName}" readonly="true"/>
+                            <h:outputText value="New name: "/>
+                            <h:inputText value="#{fileSystemBean.newName}"/>
+                            <a4j:commandButton value="Rename" render="filetree" action="#{fileSystemBean.renameDirectory}"/>
+                            <a4j:commandButton value="Delete" render="filetree renamepanel" action="#{fileSystemBean.deleteDirectory}"/>
+                        </h:panelGrid>
+                    </rich:panel>
+
+                    <h:panelGrid>
+                        <rich:fileUpload fileUploadListener="#{fileSystemBean.listener}" id="upload" maxFilesQuantity="1">
+                            <a4j:ajax event="uploadcomplete" execute="@none" render="info" />
+                        </rich:fileUpload>
+                    </h:panelGrid>
+
+                </h:column>
             </h:panelGrid>
         </h:form>
     </rich:panel>
