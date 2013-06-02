@@ -16,7 +16,7 @@
     <title>File exploree application</title>
 </h:head>
 <h:body>
-    <rich:panel id="myPanel">
+    <rich:panel id="fileServerMainPanel">
         <f:facet name="header">
             <h:outputText value="File system panel"/>
         </f:facet>
@@ -28,54 +28,28 @@
             }
         </h:outputStylesheet>
         <h:form>
-            <a4j:outputPanel ajaxRendered="true" layout="block">
-                <h:panelGrid columns="2">
-                    <h:inputText value="#{fileSystemBean.rootPath}"/>
-                    <a4j:commandButton value="update" render="filetree"/>
-                    <rich:tree id="filetree" toggleType="ajax" var="item" selectionType="ajax" selectionChangeListener="#{fileSystemBean.selectionChanged}">
-                        <rich:treeModelRecursiveAdaptor id="treeNode" roots="#{fileSystemBean.fileNode}" nodes="#{item.dirs}">
-                            <rich:treeNode id="dirTreeNode">
-                                <h:outputText value="#{item.path}"/>
-                                <rich:contextMenu attached="true" target="dirTreeNode" mode="ajax">
-                                    <rich:menuItem label="Add dir" render="addDirectoryPanel"
-                                                   mode="ajax" action="#{fileSystemBean.showAddDirectoryPanel}"
-                                                   oncomplete="#{rich:component('addDirectoryPanel')}.show()"/>
-                                    <rich:menuItem label="Add filr" render="filetree" mode="ajax" action="#{fileSystemBean.addFile}"/>
-                                    <rich:menuItem label="View" render="popupContent filetree" actionListener="#{fileSystemBean.actionListener}"
-                                                   oncomplete="#{rich:component('popup')}.show()" mode="ajax"/>
-                                </rich:contextMenu>
+            <h:panelGrid columns="3">
+                <h:outputText value="directory name: "/>
+                <h:inputText value="#{fileSystemBean.directoryName}"/>
+                <a4j:commandButton value="add" render="filetree" action="#{fileSystemBean.createDirectory}"/>
+            </h:panelGrid>
+            <h:panelGrid columns="2">
+                <h:inputText value="#{fileSystemBean.rootPath}"/>
+                <a4j:commandButton value="update" render="filetree" action="#{fileSystemBean.reload}"/>
+                <rich:tree id="filetree" toggleType="ajax" var="item"
+                           selectionType="ajax" selectionChangeListener="#{fileSystemBean.selectionChanged}">
+                    <rich:treeModelRecursiveAdaptor id="treeNode" roots="#{fileSystemBean.fileNode}" nodes="#{item.dirs}">
+                        <rich:treeNode id="dirTreeNode">
+                            <h:outputText value="#{item.path}"/>
+                        </rich:treeNode>
+                        <rich:treeModelAdaptor nodes="#{item.files}">
+                            <rich:treeNode id="fileTreeNode">
+                                <h:outputText value="#{item.name}"/>
                             </rich:treeNode>
-                            <rich:treeModelAdaptor nodes="#{item.files}">
-                                <rich:treeNode id="fileTreeNode">
-                                    <h:outputText value="#{item.name}"/>
-                                    <rich:contextMenu attached="true" target="fileTreeNode" mode="ajax">
-                                        <rich:menuItem label="View" render="popupContent" oncomplete="#{rich:component('popup')}.show()" mode="ajax"/>
-                                    </rich:contextMenu>
-                                </rich:treeNode>
-                            </rich:treeModelAdaptor>
-                        </rich:treeModelRecursiveAdaptor>
-                    </rich:tree>
-
-                    <rich:popupPanel id="addDirectoryPanel" modal="true" autosized="true" resizeable="false" width="200">
-                        <f:facet name="header">
-                            <h:outputText value="Create directory"/>
-                        </f:facet>
-                        <f:facet name="controls">
-                            <h:outputLink value="#" onclick="#{rich:component('addDirectoryPanel')}.hide(); return false;">X</h:outputLink>
-                        </f:facet>
-                        <h:panelGrid id="createtable" columns="2">
-                            <h:outputText value="directory name: "/>
-                            <h:inputText value="#{fileSystemBean.directoryName}" />
-                        </h:panelGrid>
-                        <a4j:commandButton value="Создать" action="#{fileSystemBean.createDirectory}" render="filetree" execute="addDirectoryPanel"
-                                           oncomplete="if (#{facesContext.maximumSeverity==null}) {#{rich:component('addDirectoryPanel')}.hide();}"
-                                           status="pageStat"/>
-                        <a4j:commandButton value="Отклонить" onclick="#{rich:component('addDirectoryPanel')}.hide(); return false;" status="pageStat"/>
-                    </rich:popupPanel>
-
-                </h:panelGrid>
-
-            </a4j:outputPanel>
+                        </rich:treeModelAdaptor>
+                    </rich:treeModelRecursiveAdaptor>
+                </rich:tree>
+            </h:panelGrid>
         </h:form>
     </rich:panel>
 </h:body>

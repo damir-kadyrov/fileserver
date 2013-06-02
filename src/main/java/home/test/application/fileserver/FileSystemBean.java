@@ -51,15 +51,19 @@ public class FileSystemBean {
         }
     }
 
-    public void createDirectory(){
-        File file = new File(String.format("%s/%s", parentPath, directoryName));
-        System.out.println(String.format("%s/%s", parentPath, directoryName));
-        if(!file.exists()){
-            boolean result = file.mkdir();
-        } else {
-            //TODO: alert the user
+    public void createDirectory() throws IOException{
+        if(currentSelection!=null && currentSelection instanceof FileNode){
+            FileNode fileNode = (FileNode) currentSelection;
+            parentPath = fileNode.getRootDir().getCanonicalPath();
+            File file = new File(String.format("%s/%s", parentPath, directoryName));
+            if(!file.exists()){
+                boolean result = file.mkdir();
+            } else {
+                //TODO: alert the user
+            }
+            init();
         }
-        init();
+
     }
 
     public void showAddDirectoryPanel() throws IOException {
@@ -98,6 +102,12 @@ public class FileSystemBean {
         FileNode root = new FileNode(rootPath);
         nodes.add(root);
         return nodes;
+    }
+
+    public void reload(){
+        init();
+        FileNode root = new FileNode(rootPath);
+        nodes.add(root);
     }
 
     private void init(){
