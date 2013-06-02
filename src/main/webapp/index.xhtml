@@ -33,6 +33,11 @@
                 <h:inputText value="#{fileSystemBean.directoryName}"/>
                 <a4j:commandButton value="add" render="filetree" action="#{fileSystemBean.createDirectory}"/>
             </h:panelGrid>
+            <h:panelGrid>
+                <rich:fileUpload fileUploadListener="#{fileSystemBean.listener}" id="upload" maxFilesQuantity="1">
+                    <a4j:ajax event="uploadcomplete" execute="@none" render="info" />
+                </rich:fileUpload>
+            </h:panelGrid>
             <h:panelGrid columns="2">
                 <h:inputText value="#{fileSystemBean.rootPath}"/>
                 <a4j:commandButton value="update" render="filetree" action="#{fileSystemBean.reload}"/>

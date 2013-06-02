@@ -1,12 +1,16 @@
 package  home.test.application.fileserver;
 
 import org.richfaces.component.UITree;
+import org.richfaces.event.FileUploadEvent;
 import org.richfaces.event.TreeSelectionChangeEvent;
+import org.richfaces.model.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -122,5 +126,17 @@ public class FileSystemBean {
     public void setRootPath(String rootPath) {
         this.rootPath = rootPath;
     }
+
+    public void listener(FileUploadEvent event) throws Exception {
+        UploadedFile item = event.getUploadedFile();
+        if(currentSelection!=null && currentSelection instanceof FileNode){
+            FileNode fileNode = (FileNode) currentSelection;
+            parentPath = fileNode.getRootDir().getCanonicalPath();
+            PrintStream printWriter = new PrintStream(new File(String.format("%s/%s", parentPath, item.getName())));
+            printWriter.write(item.getData());
+            printWriter.close();
+        }
+    }
+
 }
 
