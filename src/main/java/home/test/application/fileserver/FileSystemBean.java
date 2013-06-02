@@ -7,9 +7,12 @@ import org.richfaces.model.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -94,6 +97,42 @@ public class FileSystemBean {
                 //TODO: alert the user
             }
             init();
+        }
+    }
+
+    public String downloadFile() {
+        if(currentSelection!=null && currentSelection instanceof File){
+            File file = (File) currentSelection;
+            HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+
+            writeOutContent(response, file, file.getName());
+
+            FacesContext.getCurrentInstance().responseComplete();
+        }
+        return null;
+    }
+
+    private void writeOutContent(final HttpServletResponse res, final File content, final String theFilename) {
+        if (content == null) {
+            return;
+        }
+        try {
+            res.setHeader("Pragma", "no-cache");
+            res.setDateHeader("Expires", 0);
+            res.setContentType("application/octet-stream");
+            res.setHeader("Content-disposition", "attachment; filename=" + theFilename);
+            FileInputStream fis = new FileInputStream(content);
+            ServletOutputStream os = res.getOutputStream();
+            int bt = fis.read();
+            while (bt != -1) {
+                os.write(bt);
+                bt = fis.read();
+            }
+            os.flush();
+            fis.close();
+            os.close();
+        } catch (Exception exc){
+            exc.printStackTrace();
         }
     }
 

@@ -68,6 +68,7 @@
                             <h:inputText value="#{fileSystemBean.newName}"/>
                             <a4j:commandButton value="Rename" render="filetree" action="#{fileSystemBean.renameDirectory}"/>
                             <a4j:commandButton value="Delete" render="filetree renamepanel" action="#{fileSystemBean.deleteDirectory}"/>
+                            <h:commandLink value="Download file" action="#{fileSystemBean.downloadFile}"/>
                         </h:panelGrid>
                     </rich:panel>
 
